@@ -1,24 +1,13 @@
-using Crayons
 include("printfs.jl")
+include("engine.jl")
 
-function all_moves()
-
-end
-
-function possible_moves(player, board)
-    moves = []
-    for piece in 1:5
-        index = getindex(board, (player, piece))
-        push!(moves, all_moves(player, index))
-    end
-end
-
-function turn(player, board)
-    print_board(player, board)
-    moves = possible_moves(player, board)
-    return 1
+function turn(player::Int8, board::Array{Tuple{Int8,Int8},1})::Int8
+    reverseBoard = player == 0 ? board : board[end:-1:1]
+    print_board(reverseBoard)
+    moves = legal_moves(player, reverseBoard)
     # printBestMove(player, board, depth = 5)
-    # printPossibleMoves(moves)
+    print_moves(player, moves)
+    return 1
     # move = getMove()
     # executeMove(move, board)
     # if playerWins(player, board)
@@ -29,6 +18,7 @@ function turn(player, board)
 end
 
 function main()
+    # must change data structure for board in future
     board::Array{Tuple{Int8,Int8},1} =
             [(1,1),(1,2),(1,3),(1,4),(1,5),
             (2,0),(2,0),(2,0),(2,0),(2,0),
