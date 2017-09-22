@@ -20,13 +20,14 @@ function paint(square::Tuple{Int8,Int8})
     print_with_color(Crayon(background = color), " "*symbol*" ")
 end
 
-function print_board(board::Array{Tuple{Int8,Int8},1})
+function print_board(player::Int8, board::Array{Tuple{Int8,Int8},1})
     paint(" "^21)
     println()
     for y in 1:5:21
         paint(" ")
         for x in y:y+4
-            paint(board[x])
+            # if player == 1 the board is printed reversed
+            paint(board[26*player + (1-2*player)*x])
             paint(" ")
         end
         println()
@@ -49,4 +50,14 @@ function print_moves(player::Int8, moves::Array{Any,1})
         print(" "*move[2])
     end
     println()
+end
+
+function get_move(moves::Array{Any,1})::Tuple{Int8,String,Int8,Int8}
+    l = length(moves)
+    while true
+        print("What's your move? ")
+        n = get(tryparse(Int8, readline(STDIN)), Int8(0))
+        1 <= n <= l && return moves[n]
+        println("The move must be an integer between 1 and $(l)!")
+    end
 end

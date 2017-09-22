@@ -29,11 +29,22 @@ function free(index::Int8, board::Array{Tuple{Int8,Int8},1})::Bool
     return false
 end
 
+function opposite(direction)
+    if direction[1] in ['r','l']
+        newDirection = replace("rl", direction[1], "")
+         return length(direction) == 1 ? newDirection :
+                                         newDirection * replace("ud", direction[2], "")
+    else
+        return replace("ud", direction, "")
+    end
+end
+
 function possible(player::Int8, index::Int8, direction::String, board::Array{Tuple{Int8,Int8},1})::Int8
-    newIndex = dir2index(index, direction)
+    realDirection = player == 0 ? direction : opposite(direction)
+    newIndex = dir2index(index, realDirection)
     (newIndex == 0 || !free(newIndex, board)) && return 0
     while true
-        nextIndex = dir2index(newIndex, direction)
+        nextIndex = dir2index(newIndex, realDirection)
         (nextIndex == 0 || !free(nextIndex, board)) && return newIndex
         newIndex = nextIndex
     end
@@ -44,7 +55,9 @@ function all_moves(player::Int8, index::Int8, piece::Int8, board::Array{Tuple{In
     directions = ["u", "ru", "r", "rd", "d", "ld", "l", "lu"]
     for direction in directions
         newIndex = possible(player, index, direction, board)
-        newIndex > 0 && push!(moves, (piece, direction, index, newIndex))
+        newIndex == 0 && continue
+        newIndex == 13 && piece != 3 && continue
+        push!(moves, (piece, direction, index, newIndex))
     end
     return moves
 end
