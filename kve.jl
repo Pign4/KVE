@@ -8,22 +8,33 @@ function evaluate(player::Int8, board::Array{Tuple{Int8,Int8},1})::Int8
     return Int8(pl - opp)
 end
 
-function best_move(player::Int8, moves::Array{Any,1}, board::Array{Tuple{Int8,Int8},1}, depth::Int8)::Tuple{String,Int8}
-    wins(one(Int8)-player,board) && return "", -100
+global count = 0
+
+function best_move(player::Int8, moves::Array{Any,1}, board::Array{Tuple{Int8,Int8},1}, depth::Int8, alpha::Int64, beta::Int64)::Tuple{String,Int64}
+
+    global count += 1
+
+    wins(one(Int8)-player,board) && return "", max(-100, alpha)
     depth == 0 && return "", evaluate(player, board)
     length(moves) == 0 && return "", -100
     best_so_far = ("", -1000)
     for move in moves
         execute!(move[2],move[3],board)
         newMoves = legal_moves(one(Int8) - player, board)
-        cont, val = best_move(player, newMoves, board, depth-one(Int8))
+        cont, val = best_move(player, newMoves, board, depth-one(Int8), -beta, -alpha)
         execute!(move[2],move[3],board)
         val = -val
+        if val >= beta
+            return "", beta
+        end
+        if val > alpha
+            alpha = val
+        end
         if best_so_far[2] < val
             best_so_far = (move[1] * " " * cont, val)
         end
     end
-    return best_so_far
+    return best_so_far[1], max(best_so_far[2], alpha)
 end
 
 function execute!(index::Int8, newIndex::Int8, board::Array{Tuple{Int8,Int8},1})
@@ -39,7 +50,8 @@ end
 function turn(player::Int8, board::Array{Tuple{Int8,Int8},1})::Int8
     print_board(player, board)
     moves = legal_moves(player, board)
-    println(best_move(player, moves, board, Int8(4)))
+    println(best_move(player, moves, board, Int8(4), -1000, 1000))
+    println(count)
     print_moves(player, moves)
     move = get_move(moves)
     println("\33[2J")
