@@ -37,22 +37,22 @@ function print_board(player::Int8, board::Array{Tuple{Int8,Int8},1})
 end
 
 function print_moves(player::Int8, moves::Array{Any,1})
-    printed::Array{Int8,1} = []
+    printed::Array{String,1} = []
     color = player2color(player)
-    for (n, move) in zip(UnitRange{Int8}(1:length(moves)), moves)
-        if !(move[1] in printed)
-            print("\n"*int2str(move[1])*": ")
-            push!(printed, move[1])
+    for (n, move) in enumerate(moves)
+        if !(string(move[1][1]) in printed)
+            print("\n"*string(move[1][1])*": ")
+            push!(printed, string(move[1][1]))
         else
             print(", ")
         end
         print_with_color(Crayon(background = color), string(n))
-        print(" "*move[2])
+        print(" "*move[1])
     end
     println()
 end
 
-function get_move(moves::Array{Any,1})::Tuple{Int8,String,Int8,Int8}
+function get_move(moves::Array{Any,1})::Tuple{String,Int8,Int8}
     l = length(moves)
     while true
         print("What's your move? ")
